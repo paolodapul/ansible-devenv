@@ -1,0 +1,12 @@
+---
+- name: Deploy .zshrc from template
+  template:
+    src: zshrc.j2
+    dest: "{{ ansible_env.HOME }}/.zshrc"
+    backup: yes
+
+- name: Set zsh as default shell
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: /bin/zsh
+  become: yes

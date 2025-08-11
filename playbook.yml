@@ -1,0 +1,47 @@
+---
+- name: Setup Full-Stack Development Environment
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  become: no
+  
+  pre_tasks:
+    - name: Update package cache (Ubuntu)
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      become: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Update Homebrew (macOS)
+      homebrew:
+        update_homebrew: yes
+      when: ansible_os_family == "Darwin"
+
+  roles:
+    - common
+    - shell-config
+    - docker
+    - k3s
+    - javascript-runtimes
+    - python-dev
+    - rust-dev
+    - insomnia
+    - vscode
+
+  post_tasks:
+    - name: Display setup completion message
+      debug:
+        msg: |
+          🎉 Development environment setup complete!
+          
+          Installed tools:
+          - Node.js, Bun, Deno
+          - Python with pyenv and pipx
+          - Rust with cargo
+          - Docker ({{ 'OrbStack' if ansible_os_family == 'Darwin' else 'Native Docker' }})
+          - K3s Kubernetes
+          - Insomnia for API testing
+          - VS Code with extensions
+          
+          Please restart your terminal to load new shell configuration.

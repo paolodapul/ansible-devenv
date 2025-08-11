@@ -1,0 +1,32 @@
+---
+- name: Install Insomnia (macOS)
+  homebrew_cask:
+    name: insomnia
+    state: present
+  when: ansible_os_family == "Darwin"
+
+- name: Install Insomnia (Ubuntu)
+  block:
+    - name: Download Insomnia deb package
+      get_url:
+        url: "https://updates.insomnia.rest/downloads/ubuntu/latest?&app=com.insomnia.app&source=website"
+        dest: "/tmp/insomnia.deb"
+        follow_redirects: yes
+
+    - name: Install Insomnia
+      apt:
+        deb: "/tmp/insomnia.deb"
+        state: present
+
+    - name: Clean up Insomnia deb file
+      file:
+        path: "/tmp/insomnia.deb"
+        state: absent
+  become: yes
+  when: ansible_os_family == "Debian"
+
+- name: Verify Insomnia installation
+  command: which insomnia
+  register: insomnia_check
+  changed_when: false
+  failed_when: false

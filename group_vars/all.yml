@@ -1,0 +1,41 @@
+---
+# Common versions
+kubectl_version: "v1.28.0"
+node_version: "18"
+
+# VS Code configuration paths
+vscode_config_paths:
+  Darwin: "Library/Application Support/Code/User"
+  Debian: ".config/Code/User"
+
+# Common packages
+common_packages:
+  Darwin:
+    - git
+    - curl
+    - wget
+    - jq
+    - tree
+  Debian:
+    - git
+    - curl
+    - wget
+    - jq
+    - tree
+    - build-essential
+    - software-properties-common
+    - apt-transport-https
+    - ca-certificates
+    - gnupg
+    - lsb-release
+
+# Python packages
+python_packages:
+  Darwin:
+    - python3
+    - python3-pip
+  Debian:
+    - python3
+    - python3-pip
+    - python3-venv
+    - python3-dev

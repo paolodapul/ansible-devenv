@@ -1,0 +1,52 @@
+---
+- name: Install VS Code (Ubuntu)
+  block:
+    - name: Add VS Code repository key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+    
+    - name: Add VS Code repository
+      apt_repository:
+        repo: "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
+        state: present
+    
+    - name: Install VS Code
+      apt:
+        name: code
+        state: present
+        update_cache: yes
+  become: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install VS Code (macOS)
+  homebrew_cask:
+    name: visual-studio-code
+    state: present
+  when: ansible_os_family == "Darwin"
+
+- name: Ensure VS Code user directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/{{ vscode_config_paths[ansible_os_family] }}"
+    state: directory
+
+- name: Deploy VS Code settings
+  template:
+    src: settings.json.j2
+    dest: "{{ ansible_env.HOME }}/{{ vscode_config_paths[ansible_os_family] }}/settings.json"
+    backup: yes
+
+- name: Install VS Code extensions
+  command: code --install-extension {{ item }}
+  loop:
+    - ms-vscode.vscode-typescript-next
+    - bradlc.vscode-tailwindcss
+    - ms-python.python
+    - rust-lang.rust-analyzer
+    - denoland.vscode-deno
+    - oven.bun-vscode
+    - ms-vscode-remote.remote-containers
+    - ms-azuretools.vscode-docker
+    - ms-kubernetes-tools.vscode-kubernetes-tools
+    - redhat.vscode-yaml
+  ignore_errors: yes

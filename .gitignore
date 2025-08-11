@@ -1,0 +1,46 @@
+# Ansible generated files
+*.retry
+.ansible/
+ansible.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE/Editor files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Backup files created by Ansible templates
+*.backup
+*~
+
+# Local environment files
+.env
+.env.local
+
+# Personal customizations (optional)
+group_vars/personal.yml
+host_vars/
+
+# Logs
+*.log
+logs/
+
+# Any sensitive data files (if you add them later)
+secrets/
+vault_pass.txt

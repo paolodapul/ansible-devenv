@@ -1,0 +1,32 @@
+---
+- name: Install Node.js via package manager
+  package:
+    name: nodejs
+    state: present
+  become: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install Node.js via Homebrew
+  homebrew:
+    name: node
+    state: present
+  when: ansible_os_family == "Darwin"
+
+- name: Install Bun
+  shell: curl -fsSL https://bun.sh/install | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.bun/bin/bun"
+
+- name: Install Deno
+  shell: curl -fsSL https://deno.land/install.sh | sh
+  args:
+    creates: "{{ ansible_env.HOME }}/.deno/bin/deno"
+
+- name: Add runtime paths to shell profile
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    line: "{{ item }}"
+    create: yes
+  loop:
+    - 'export PATH="$HOME/.bun/bin:$PATH"'
+    - 'export PATH="$HOME/.deno/bin:$PATH"'
