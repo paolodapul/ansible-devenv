@@ -44,3 +44,11 @@ logs/
 # Any sensitive data files (if you add them later)
 secrets/
 vault_pass.txt
+
+# AWS credentials and config
+.aws/credentials
+.aws/config
+
+# LocalStack data
+.localstack/
+/tmp/localstack/

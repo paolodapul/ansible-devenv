@@ -1,0 +1,146 @@
+---
+- name: Install AWS CLI v2 (macOS)
+  block:
+    - name: Download AWS CLI installer for macOS
+      get_url:
+        url: "https://awscli.amazonaws.com/AWSCLIV2.pkg"
+        dest: "/tmp/AWSCLIV2.pkg"
+
+    - name: Install AWS CLI
+      command: sudo installer -pkg /tmp/AWSCLIV2.pkg -target /
+
+    - name: Clean up AWS CLI installer
+      file:
+        path: "/tmp/AWSCLIV2.pkg"
+        state: absent
+  when: ansible_os_family == "Darwin"
+
+- name: Install AWS CLI v2 (Ubuntu)
+  block:
+    - name: Download AWS CLI installer for Linux
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+        dest: "/tmp/awscliv2.zip"
+
+    - name: Install unzip if not present
+      apt:
+        name: unzip
+        state: present
+      become: yes
+
+    - name: Extract AWS CLI
+      unarchive:
+        src: "/tmp/awscliv2.zip"
+        dest: "/tmp"
+        remote_src: yes
+
+    - name: Install AWS CLI
+      command: sudo /tmp/aws/install
+      args:
+        creates: /usr/local/bin/aws
+
+    - name: Clean up AWS CLI files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/tmp/awscliv2.zip"
+        - "/tmp/aws"
+  when: ansible_os_family == "Debian"
+
+- name: Install LocalStack CLI
+  pip:
+    name:
+      - localstack
+      - awscli-local
+    state: present
+    extra_args: --user
+
+- name: Install LocalStack via package manager (alternative)
+  block:
+    - name: Install LocalStack via Homebrew (macOS)
+      homebrew:
+        name: localstack/tap/localstack-cli
+        state: present
+      when: ansible_os_family == "Darwin"
+  ignore_errors: yes
+
+- name: Install AWS CDK (optional but useful)
+  npm:
+    name: aws-cdk
+    global: yes
+  ignore_errors: yes
+
+- name: Install AWS SAM CLI
+  block:
+    - name: Install AWS SAM CLI (macOS)
+      homebrew:
+        name: aws-sam-cli
+        state: present
+      when: ansible_os_family == "Darwin"
+
+    - name: Install AWS SAM CLI (Ubuntu)
+      block:
+        - name: Download SAM CLI installer
+          get_url:
+            url: "https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip"
+            dest: "/tmp/aws-sam-cli.zip"
+
+        - name: Extract SAM CLI
+          unarchive:
+            src: "/tmp/aws-sam-cli.zip"
+            dest: "/tmp"
+            remote_src: yes
+
+        - name: Install SAM CLI
+          command: sudo /tmp/install
+          args:
+            creates: /usr/local/bin/sam
+
+        - name: Clean up SAM CLI files
+          file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - "/tmp/aws-sam-cli.zip"
+            - "/tmp/install"
+      when: ansible_os_family == "Debian"
+
+- name: Verify AWS CLI installation
+  command: aws --version
+  register: aws_version
+  changed_when: false
+
+- name: Verify LocalStack installation
+  command: localstack --version
+  register: localstack_version
+  changed_when: false
+  ignore_errors: yes
+
+- name: Display AWS tools versions
+  debug:
+    msg: |
+      AWS Tools installed:
+      - AWS CLI: {{ aws_version.stdout }}
+      - LocalStack: {{ localstack_version.stdout | default('Not installed via CLI') }}
+
+# Add this to the aws-tools role
+- name: Create LocalStack configuration directory
+  file:
+    path: "{{ ansible_env.HOME }}/.localstack"
+    state: directory
+
+- name: Create sample LocalStack config
+  copy:
+    dest: "{{ ansible_env.HOME }}/.localstack/config.yml"
+    content: |
+      # LocalStack configuration
+      version: "1.0"
+      environment:
+        SERVICES: "s3,dynamodb,lambda,apigateway,cloudformation,sts,iam"
+        DEBUG: "1"
+        DATA_DIR: "/tmp/localstack/data"
+        DOCKER_SOCK: "/var/run/docker.sock"
+      extensions:
+        - name: "localstack-extension-sample"
+    force: no

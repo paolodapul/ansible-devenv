@@ -4,7 +4,7 @@
   connection: local
   gather_facts: yes
   become: no
-  
+
   pre_tasks:
     - name: Update package cache (Ubuntu)
       apt:
@@ -26,6 +26,7 @@
     - javascript-runtimes
     - python-dev
     - rust-dev
+    - aws-tools
     - insomnia
     - vscode
 
@@ -34,14 +35,20 @@
       debug:
         msg: |
           🎉 Development environment setup complete!
-          
+
           Installed tools:
           - Node.js, Bun, Deno
           - Python with pyenv and pipx
           - Rust with cargo
           - Docker ({{ 'OrbStack' if ansible_os_family == 'Darwin' else 'Native Docker' }})
           - K3s Kubernetes
+          - AWS CLI v2, LocalStack, SAM CLI
           - Insomnia for API testing
           - VS Code with extensions
-          
+
+          AWS Setup:
+          - Run 'aws configure' to set up your credentials
+          - Use 'localstack start' to run local AWS services
+          - LocalStack dashboard: http://localhost:4566
+
           Please restart your terminal to load new shell configuration.

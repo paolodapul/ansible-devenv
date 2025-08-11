@@ -49,3 +49,31 @@ if [[ -d "$HOME/.nvm" ]]; then
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 fi
+
+# Add these AWS aliases to your existing zshrc.j2 template
+
+# AWS aliases
+alias aws-profile='export AWS_PROFILE'
+alias aws-whoami='aws sts get-caller-identity'
+alias aws-regions='aws ec2 describe-regions --query "Regions[].{Name:RegionName}" --output table'
+
+# LocalStack aliases
+alias ls-start='localstack start'
+alias ls-stop='localstack stop'
+alias ls-status='localstack status'
+alias ls-logs='localstack logs'
+
+# AWS Local (for use with LocalStack)
+alias awsl='awslocal'
+alias s3l='awslocal s3'
+alias dynamol='awslocal dynamodb'
+alias lambdal='awslocal lambda'
+
+# LocalStack endpoints
+export LOCALSTACK_ENDPOINT="http://localhost:4566"
+
+# AWS CDK aliases (if installed)
+alias cdk-deploy='cdk deploy'
+alias cdk-synth='cdk synth'
+alias cdk-diff='cdk diff'
+alias cdk-destroy='cdk destroy'
